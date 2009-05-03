@@ -1,0 +1,6 @@
+# Ignore scratch files
+*~
+
+# Ignore intermediate compiled files
+*.pyc
+*.pyo
