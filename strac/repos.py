@@ -1,3 +1,7 @@
+# Copyright (C) 2009 Ashley J. Wilson
+# This software is licensed as described in the file COPYING in the root
+# directory of this distribution.
+#
 # Implements the interfaces required for a Trac version control plugin, as specified
 # in trac/versioncontrol/api.py.
 

@@ -1,0 +1,18 @@
+Copyright (C) 2009 Ashley J. Wilson
+This software is licensed as described in the file COPYING in the root
+directory of this distribution.
+
+# What is Strac?
+
+"Strac" is a Trac plugin that interfaces with VisualWorks Smalltalk's STORE
+version control system.  It works by querying the STORE database directly,
+then doing a certain amount of source formatting.
+
+In its current state, Strac works with Trac 0.10 and the PostgreSQL database.
+Support for Trac 0.11 and at least the flexibility to interface with other
+databases is forthcoming.  While it offers full browsing of classes, methods,
+namespaces, class extensions and shared variable definitions, it does not yet
+provide a graceful way to view individual "commit" contents, package blessing
+levels, or "real" revision histories.  Also, it may or may not have a fairly
+serious bug about not releasing database connections properly.  In other words,
+the "use at your own risk" disclaimer applies unusually strongly here.

@@ -1,3 +1,7 @@
+# Copyright (C) 2009 Ashley J. Wilson
+# This software is licensed as described in the file COPYING in the root
+# directory of this distribution.
+
 from storenode import StoreNode
 from node_util import _strac_decode
 

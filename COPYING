@@ -1,15 +1,3 @@
-from setuptools import setup, find_packages
-
-setup(
-    name='Strac',
-    description='Trac bindings for the Store version control system.',
-    author='Ash Wilson',
-    author_email='smashwilson@gmail.com',
-
-    keywords='trac plugin store smalltalk visualworks',
-    url='http://azurefire.net',
-    version='0.1',
-    license="""
 Copyright (c) 2009 Ashley J. Wilson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,13 +17,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-""",
-    long_description="""
-        This Trac 0.10 plugin provides support for Store version control system
-        for Smalltalk.
-    """,
-    zip_safe=True,
-    packages=['strac'],
-    entry_points = {'trac.plugins': ['store = strac.repos']},
-    install_requires=[]
-)

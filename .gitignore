@@ -4,3 +4,6 @@
 # Ignore intermediate compiled files
 *.pyc
 *.pyo
+
+# Ignore anything in the build tree.
+build/*
