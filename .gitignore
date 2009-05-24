@@ -9,3 +9,7 @@
 build/*
 dist/*
 Strac.egg-info/*
+
+# Utility batch or shell scripts for one-line deployment
+# (platform- and system-specific)
+deploy.*

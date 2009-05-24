@@ -5,7 +5,8 @@
 # Implements the interfaces required for a Trac version control plugin, as
 # specified in trac/versioncontrol/api.py.
 
-from time import time
+from datetime import datetime
+from trac.util.datefmt import utc
 
 from trac.core import Component, TracError, implements
 
@@ -85,7 +86,7 @@ class StoreRepository(Repository):
         will be visible.
         """
         Repository.__init__(self, connection_string, authz, log)
-        self.connection = pgdb.connect(repos_name)
+        self.connection = pgdb.connect(connection_string)
         self.root = RootNode(self, root_store_bundle, root_store_package)
 
     def close(self):
@@ -221,4 +222,4 @@ class StoreChangeset(Changeset):
         return cls(rev, 
                    "Changeset support is not yet implemented in Strac.  I'm working on it!",
                    'smash',
-                   time())
+                   datetime.now(utc))
