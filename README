@@ -8,11 +8,69 @@ directory of this distribution.
 version control system.  It works by querying the STORE database directly,
 then doing a certain amount of source formatting.
 
-In its current state, Strac works with Trac 0.10 and the PostgreSQL database.
-Support for Trac 0.11 and at least the flexibility to interface with other
-databases is forthcoming.  While it offers full browsing of classes, methods,
-namespaces, class extensions and shared variable definitions, it does not yet
-provide a graceful way to view individual "commit" contents, package blessing
-levels, or "real" revision histories.  Also, it may or may not have a fairly
-serious bug about not releasing database connections properly.  In other words,
-the "use at your own risk" disclaimer applies unusually strongly here.
+# Installation
+
+First, make sure you have the following prerequisites installed:
+
+ * PyGreSQL, the python PostgreSQL API.  Specifically, Strac uses the
+   "pgdb" module.  Download the version for your OS and architecture
+   here: http://www.pygresql.org/readme.html
+
+Download the latest .egg file from the Github download page at:
+http://github.com/smashwilson/strac/downloads
+
+Log in to Trac as an administrator, and upload the .egg file in the
+"plugins" section of the "admin" tab.
+
+# Configuration
+
+You'll need to edit your trac.ini file to point Trac to your STORE
+database.
+
+First, change the "repository_type" and "repository_dir" to activate
+the "browse source" tab.  The value of the "repository_dir" setting is
+ignored, but it must be non-empty for Trac to attempt to load any
+version control plugins.
+
+[trac]
+repository_dir = .
+repository_type = store
+
+Now add a [strac] section to specify the database connection string
+and repository masks.  The format of the connection string (as
+specified by pgdb) is host:database:user:password:opt:tty, with all
+parts optional.  Note that Strac does not currently support actual
+authentication.  The root_ settings specify prefixes that limit which
+packages and bundles appear: both settings accept comma-separated values
+or the special string ALL.
+
+[strac]
+store_database_connection = localhost:store:strac:foo
+root_store_bundles = MyProject
+root_store_packages = MyProject-
+
+Restart tracd (or apache) and all should be well.
+
+# Compatibility
+
+Strac in its present state supports:
+
+ * Trac 0.11
+ * STORE repositories from VisualWorks 7.6
+ * using the PostgreSQL database as a backend.
+
+Support for other databases is forthcoming.
+
+# Capabilities
+
+Strac implements all functionality required by the "Browse Source" tab in
+Trac.  It allows you to browse classes, methods, namespaces, class
+extensions, and shared variable definitions, all rendered in wiki format.
+
+It does not yet support viewing version to version diffs, package blessings
+and blessing comments, or revision histories.  No STORE commit will appear in
+the timeline.
+
+Also, it may or may not have a fairly serious bug about not releasing database
+connections properly.  In other words, the "use at your own risk" disclaimer
+applies unusually strongly here.

@@ -125,7 +125,7 @@ class StoreRepository(Repository):
             package = PackageNode.with_name(self, parts[0], rev)
             if package != None: return package            
         else:
-            # Case 4: /PackagName/Fully.Qualified.ClassName
+            # Case 4: /PackageName/Fully.Qualified.ClassName
             package = PackageNode.with_name(self, parts[-2], rev)
             if package != None:
                 subnode = package.subnode_named(parts[-1])

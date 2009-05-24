@@ -8,7 +8,7 @@ setup(
 
     keywords='trac plugin store smalltalk visualworks',
     url='http://azurefire.net',
-    version='0.1',
+    version='0.2',
     license="""
 Copyright (c) 2009 Ashley J. Wilson
 
@@ -31,8 +31,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """,
     long_description="""
-        This Trac 0.10 plugin provides support for Store version control system
-        for Smalltalk.
+        This Trac 0.11 plugin provides limited support for Store version
+        control system for Smalltalk.
     """,
     zip_safe=True,
     packages=['strac'],
