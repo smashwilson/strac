@@ -2,8 +2,8 @@
 # This software is licensed as described in the file COPYING in the root
 # directory of this distribution.
 #
-# Implements the interfaces required for a Trac version control plugin, as specified
-# in trac/versioncontrol/api.py.
+# Implements the interfaces required for a Trac version control plugin, as
+# specified in trac/versioncontrol/api.py.
 
 from time import time
 
@@ -27,16 +27,31 @@ else:
     has_pgdb = True
 
 class StoreConnector(Component):
-    """Component that registers the Store repository type with the Trac repository manager."""
+    """
+    Component that registers the Store repository type with the Trac
+    repository manager.
+    """
 
-    root_store_bundle = Option('trac', 'root_store_bundles', '',
-       """Use this bundle as the root of the Store repository view.  You may specify several
-          bundles as a comma-separated list, or the special value ALL to include all bundles.""")
+    store_database_connection = Option('strac', 'store_database_connection',
+        '',
+        """
+        Database connection string that points to your Store repository.  See
+        your database's documenation for the format to use.
+        """)
 
-    root_store_package = Option('trac', 'root_store_packages', '',
-       """Use the collection of packages that begin with this string as the
-          root of the Store repository view.  You may specify several prefixes as a comma-
-          separated list, or the special value ALL to include all packages.""")
+    root_store_bundle = Option('strac', 'root_store_bundles', '',
+        """
+        Use this bundle as the root of the Store repository view.  You may
+        specify several bundles as a comma-separated list, or the special
+        value ALL to include all bundles.
+        """)
+
+    root_store_package = Option('strac', 'root_store_packages', '',
+       """
+       Use the collection of packages that begin with this string as the root
+       of the Store repository view.  You may specify several prefixes as a
+       comma-separated list, or the special value ALL to include all packages.
+       """)
 
     implements(IRepositoryConnector)
 
@@ -52,15 +67,16 @@ class StoreConnector(Component):
     def get_repository(self, repos_type, repos_name, authname):
         """Return an instance of a Store repository."""
 
-        root_store_bundles = self.config['trac'].get('root_store_bundles')
-        root_store_packages = self.config['trac'].get('root_store_packages')
-
-        return StoreRepository(repos_name, root_store_bundles, root_store_packages, None, self.log)
+        connection_string = self.config['strac'].get('store_database_connection')
+        root_store_bundles = self.config['strac'].get('root_store_bundles')
+        root_store_packages = self.config['strac'].get('root_store_packages')
+        return StoreRepository(connection_string, root_store_bundles,
+                               root_store_packages, None, self.log)
 
 class StoreRepository(Repository):
     """Mediates communications with the Store repository in a database."""
 
-    def __init__(self, repos_name, root_store_bundle, root_store_package, authz, log):
+    def __init__(self, connection_string, root_store_bundle, root_store_package, authz, log):
         """Initialize the repository.
 
         This call creates the database connection.  repos_name is expected to be a valid database
@@ -68,10 +84,8 @@ class StoreRepository(Repository):
         consider as the root of the Store repository view: if neither are provided, the full repository
         will be visible.
         """
-
-        Repository.__init__(self, repos_name, authz, log)
-
-        self.connection = pgdb.connect(repos_name)    
+        Repository.__init__(self, connection_string, authz, log)
+        self.connection = pgdb.connect(repos_name)
         self.root = RootNode(self, root_store_bundle, root_store_package)
 
     def close(self):

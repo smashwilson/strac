@@ -5,5 +5,7 @@
 *.pyc
 *.pyo
 
-# Ignore anything in the build tree.
+# Ignore anything in the build, dist, or egg info directories.
 build/*
+dist/*
+Strac.egg-info/*

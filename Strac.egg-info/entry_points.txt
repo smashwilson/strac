@@ -1,3 +1,0 @@
-[trac.plugins]
-store = strac.repos
-
