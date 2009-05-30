@@ -23,15 +23,14 @@ class TestRepository(StoreTestCase):
         self.assertTrue(self.repos != None)
 
     def test_root_access(self):
-        """Pull configuration options from trac.ini and ensure that the root node behaves
+        """
+        Pull configuration options from trac.ini and ensure that the root node behaves
         accordingly.
         """
 
-        self.assertEquals('TestBundle', self.env.config['trac'].get('root_store_bundles'))
-
+        self.assertEquals('TestBundle', self.env.config['strac'].get('root_store_bundles'))
         self.node = self.repos.get_node('/')
         self.assertTrue(self.node != None)
-    
         contents = self.node.get_entries()
         self.assertEquals('TestBundle', contents.next().get_name())
 
@@ -58,17 +57,14 @@ class TestRepository(StoreTestCase):
     def test_get_node(self):
         """Test the get_node() method for bundles, packages, and classes."""
 
-        node0 = self.repos.get_node('/TestBundle')
-
+        node0 = self.repos.get_node('/TestBundle', '1.0')
         self.assertEquals('TestBundle', node0.name)
-        self.assertEquals(3, len([n for n in node0.get_entries()]))
+        self.assertEquals(2, len([n for n in node0.get_entries()]))
 
         node1 = self.repos.get_node('/TestPackage2')
-
-        self.assertEquals(3, len([n for n in node1.get_entries()]))
+        self.assertEquals(1, len([n for n in node1.get_entries()]))
 
         node2 = self.repos.get_node('/TestPackage2/StracTest.StracClass21')
-
         self.assertEquals(ClassNode, node2.__class__)
 
     def test_revision_stubs(self):
@@ -89,6 +85,6 @@ class TestRepository(StoreTestCase):
         [(p, r, h) for (p, r, h) in self.repos.get_path_history('/', None, None)]
 
         # Called during 'get changes' session
-        [(o, n, k, c) for (o, n, k, c) in self.repos.get_changes('/TestPackage1', '1.0', '/TestPackage1', '1.1')]
+        # [(o, n, k, c) for (o, n, k, c) in self.repos.get_changes('/TestPackage1', '1.0', '/TestPackage1', '1.1')]
 
         self.assertTrue(True, 'get_changesets() returned an iterable')

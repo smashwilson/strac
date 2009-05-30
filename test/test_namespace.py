@@ -20,31 +20,33 @@ class TestNamespace(StoreTestCase):
         self.assertNotEquals(None, self.node)
         self.assertEquals(NamespaceNode, self.node.__class__)
         self.assertEquals('* Namespace: StracTest', self.node.get_name())
-        self.assertEquals('1.2', self.node.rev)
+        self.assertEquals('1.0', self.node.rev)
         self.assertEquals(NamespaceNode.FILE, self.node.kind)
 
     def test_definition(self):
         """NamespaceNodes should know the code that creates them."""
 
-        self.assertEquals("""
-Smalltalk defineNameSpace: #StracTest
+        self.assertEquals(
+"""Smalltalk defineNameSpace: #StracTest
 \tprivate: false
 \timports: '
 \t\t\tprivate Smalltalk.*
 \t\t\tprivate Core.*
 \t\t\t'
-\tcategory: 'TestPackage1'
-""".strip(), self.node.get_definition())
+\tcategory: 'TestPackage1'""", self.node.get_definition())
 
     def test_comment(self):
         """Namespaces can (but often do not) have comments."""
 
-        self.assertEquals("Namespaces can have comments, too!", self.node.get_comment().strip())
+        self.assertEquals(
+            "Namespaces can have comments, too!",
+            self.node.get_comment())
 
     def test_content(self):
         """Test the full content stream of the Namespace node."""
 
-        self.assertEquals("""{{{
+        self.assertEquals(
+"""{{{
 Smalltalk defineNameSpace: #StracTest
 \tprivate: false
 \timports: '
@@ -62,10 +64,10 @@ Namespaces can have comments, too!
 
 {{{
 Smalltalk.StracTest defineSharedVariable: #SomethingOrOther
-	private: false
-	constant: false
-	category: 'testing'
-	initializer: 'Array new: 5'
+\tprivate: false
+\tconstant: false
+\tcategory: 'testing'
+\tinitializer: 'Array new: 5'
 }}}
 """, self.node.get_content().getvalue())
 

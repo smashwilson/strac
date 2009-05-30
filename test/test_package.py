@@ -14,14 +14,14 @@ class TestPackage(StoreTestCase):
 
     def setUp(self):
         StoreTestCase.setUp(self)
-        self.node = PackageNode.with_name(self.repos, 'TestPackage2', '1.1')
+        self.node = PackageNode.with_name(self.repos, 'TestPackage2', '1.0')
 
     def test_get_by_name(self):
         """Acquiring a package by name should return the most recent version."""
 
         self.assertTrue(self.node != None)
         self.assertEquals('TestPackage2', self.node.get_name())
-        self.assertEquals('1.1', self.node.rev)
+        self.assertEquals('1.0', self.node.rev)
         self.assertEquals(PackageNode.DIRECTORY, self.node.kind)
 
     def test_content(self):
@@ -33,8 +33,7 @@ class TestPackage(StoreTestCase):
         """A Package should return one child node for each subnode it contains."""
 
         children = [x for x in self.node.get_entries()]
-        self.assertEquals(2, len(children))
-
+        self.assertEquals(1, len(children))
         for node in children:
             if node.__class__ != ClassNode:
                 self.fail('Non-ClassNode ' + node.get_name() + ' reported.')
@@ -44,9 +43,8 @@ class TestPackage(StoreTestCase):
     def test_class_overrides(self):
         """A Package should return a ClassExtensionNode for each class override it contains."""
 
-        node = PackageNode.with_name(self.repos, 'TestPackage1')
+        node = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
         children = [x for x in node.get_entries()]
-        
         self.assertTrue(
             (ClassExtensionNode, '/TestPackage1/Core.Object') in
             ((x.__class__, x.path) for x in children))
@@ -54,8 +52,7 @@ class TestPackage(StoreTestCase):
     def test_namespaces(self):
         """A Package should return a NamespaceNode for each namespace defined within it."""
 
-        node = PackageNode.with_name(self.repos, 'TestPackage1')
-
+        node = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
         self.assertTrue(
             (NamespaceNode, '/TestPackage1/StracTest') in
             ((x.__class__, x.path) for x in node.get_entries()))

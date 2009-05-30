@@ -9,6 +9,7 @@
 build/*
 dist/*
 Strac.egg-info/*
+tmp_env/*
 
 # Utility batch or shell scripts for one-line deployment
 # (platform- and system-specific)

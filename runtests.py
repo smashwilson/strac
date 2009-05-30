@@ -4,6 +4,12 @@
 # This software is licensed as described in the file COPYING in the root
 # directory of this distribution.
 
+# Note:
+# This suite of unit tests depends on the presence of a certain configuration
+# of bundles and packages within the STORE repository.
+#
+# 
+
 from trac.env import Environment
 
 from test.test_repository import *
@@ -22,9 +28,9 @@ env_path = 'tmp_env'
 def remove_env():
     for root, dirs, files in os.walk(env_path, topdown=False):
         for name in files:
-            os.remove(os.path.join(env_path, name))
+            os.remove(os.path.join(root, name))
         for name in dirs:
-            os.rmdir(os.path.join(env_path, name))
+            os.rmdir(os.path.join(root, name))
 
 # Create a fresh Trac env at env_path
 remove_env()

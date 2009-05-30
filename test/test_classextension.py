@@ -12,7 +12,7 @@ class TestClassExtension(StoreTestCase):
 
     def setUp(self):
         StoreTestCase.setUp(self)
-        self.pkg_node = PackageNode.with_name(self.repos, 'TestPackage1', '1.1')
+        self.pkg_node = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
         self.node = self.pkg_node.subnode_named('Core.Object')
 
     def test_node_access(self):
@@ -20,7 +20,7 @@ class TestClassExtension(StoreTestCase):
 
         self.assertEquals(ClassExtensionNode, self.node.__class__)
         self.assertEquals(self.pkg_node, self.node.owning_package)
-        self.assertEquals('1.1', self.node.rev)
+        self.assertEquals('1.0', self.node.rev)
         self.assertEquals('/TestPackage1/Core.Object', self.node.path)
         self.assertEquals('* Extension: Core.Object', self.node.get_name())
         self.assertEquals(ClassExtensionNode.FILE, self.node.kind)
@@ -28,7 +28,8 @@ class TestClassExtension(StoreTestCase):
     def test_content(self):
         """Class extensions should render themselves nicely."""
 
-        self.assertEquals("""Class {{{Core.Object}}}, as extended by {{{TestPackage1}}}.
+        self.assertEquals(
+"""Class {{{Core.Object}}}, as extended by {{{TestPackage1}}}.
 
 === Instance-Side Methods ===
 
@@ -59,16 +60,18 @@ asStracObject
     def test_shared_variable(self):
         """Class extensions should know about shared variables they contain."""
 
-        node = PackageNode.with_name(self.repos, 'TestPackage2', '1.2').subnode_named('StracTest.StracClass11')
+        package = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
+
+        print '\n'.join(x.name for x in package.get_entries())
+        
+        node = package.subnode_named('Core.Point')
         self.assertEquals(
             ['ExtraVar'],
             [sv.name for sv in node.get_shared_variables()])
         sv = node.get_shared_variables()[0]
         self.assertEquals(
-"""StracTest.StracClass11 defineSharedVariable: #ExtraVar
-	private: false
-	constant: false
-	category: 'extended'
-	initializer: 'Array new: 5'""", sv.definition)
-
-        
+"""Core.Point defineSharedVariable: #ExtraVar
+\tprivate: false
+\tconstant: false
+\tcategory: 'extended'
+\tinitializer: 'Array new: 5'""", sv.definition)
