@@ -15,20 +15,24 @@ from test.test_classextension import *
 from test.test_namespace import *
 
 import unittest
-
 import os
 
-env_path = os.getcwd() + '/tmp_env/'
+env_path = 'tmp_env'
+
+def remove_env():
+    for root, dirs, files in os.walk(env_path, topdown=False):
+        for name in files:
+            os.remove(os.path.join(env_path, name))
+        for name in dirs:
+            os.rmdir(os.path.join(env_path, name))
 
 # Create a fresh Trac env at env_path
-
-os.system('rm -rf ' + env_path)
+remove_env()
 Environment(env_path, True)
 
 # Run all of the test cases
-
 unittest.main()
 
 # Clean up the Trac env.
+remove_env()
 
-os.system('rm -rf ' + env_path)
