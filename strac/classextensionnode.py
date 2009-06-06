@@ -48,7 +48,6 @@ class ClassExtensionNode(StoreNode):
         self._write_shared_vars(stream, "\n=== Class Shared Variables ===", self.shared_vars)
 
         stream.reset()
-
         return stream
 
     def get_content_type(self):
@@ -71,7 +70,8 @@ class ClassExtensionNode(StoreNode):
 
     @classmethod
     def just_named(cls, name, owning_package):
-        """Return a ClassExtensionNode that was created with the minimal amount of database
+        """
+        Return a ClassExtensionNode that was created with the minimal amount of database
         work (only the path is known).  This is equivalent to the default initialization
         method, but more explicit.
         """

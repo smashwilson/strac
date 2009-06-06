@@ -12,7 +12,8 @@ from node_util import _strac_decode, Method, Protocol, SharedVariable
 class PackageNode(StoreNode):
     """A Package in the Store repository.
 
-    Data about packages is stored in the tw_package table."""
+    Data about packages is stored in the tw_package table.
+    """
 
     def __init__(self, path, rev, repos, id):
         StoreNode.__init__(self, path, rev, StoreNode.DIRECTORY, repos)
@@ -21,54 +22,77 @@ class PackageNode(StoreNode):
     def get_entries(self):
         """Generator method that produces the subnodes contained in this package.
 
-        Note that subnodes are constructed with the minimum possible database work: class definitions
-        and method sources are not available for each entry.  To access a subnode for in-depth work,
-        use subnode_named().
+        Note that subnodes are constructed with the minimum possible database
+        work: class definitions and method sources are not available for each
+        entry.  To access a subnode for in-depth work, use subnode_named().
         """
 
         # Start by finding the namespaces within this package.
-        for row in self.repos.sql("SELECT name, environmentstring FROM tw_pkgnamespacesview WHERE packageref = %i" % self.id):
+        for row in self.repos.sql("""
+            SELECT name, environmentstring FROM tw_pkgnamespacesview
+            WHERE packageref = %i
+            """ % self.id):
             fullname = row[1] + '.' + row[0]
             yield NamespaceNode.just_named(fullname, self)
 
-        # Find the names of all classes that have methods defined by this package.  Filter out the metaclasses.
-        classes_touched = []
-        for row in self.repos.sql("SELECT DISTINCT classname FROM tw_methodsview WHERE packageref = %i" % self.id):
+        # Find the names of all classes that have methods defined by this
+        # package.  Filter out the metaclasses.
+        classes_touched = set()
+        for row in self.repos.sql("""
+            SELECT DISTINCT classname FROM tw_methodsview
+            WHERE packageref = %i
+            """ % self.id):
             classname = row[0]
             if classname.endswith(' class'):
                 classname = classname[:-6]
-            classes_touched.append(classname)
-        classes_touched = set(classes_touched)
+            classes_touched.add(classname)
 
-        # Find classes defined within this package.  Yield a ClassNode for each and remember the yielded class
-        # names.
+        # Find the names of all shared variables that reside within classes
+        # in this package.
+        for row in self.repos.sql("""
+            SELECT DISTINCT environmentstring FROM tw_dataandsourcesview
+            WHERE typestring = 'C' AND packageref = %i
+            """ % self.id):
+            classname = row[0]
+            classes_touched.add(classname)
+
+        # Find classes defined within this package.  Yield a ClassNode for
+        # each and remember the yielded class names.
         classes_defined = []
-        for row in self.repos.sql("SELECT name, environmentstring FROM tw_pkgclassesview WHERE packageref = %i" % self.id):
+        for row in self.repos.sql("""
+            SELECT name, environmentstring FROM tw_pkgclassesview
+            WHERE packageref = %i
+            """ % self.id):
             fullname = row[1] + '.' + row[0]
             classes_defined.append(fullname)
             yield ClassNode.just_named(fullname, self)
 
-        # Yield a ClassExtensionNode for each class name that didn't have a definition in this package.
+        # Yield a ClassExtensionNode for each class name that didn't have a
+        # definition in this package.
         for extended_class_name in [c for c in classes_touched if c not in classes_defined]:
             yield ClassExtensionNode.just_named(extended_class_name, self)
 
     def subnode_named(self, fullname):
-        """Return a fully-initialized ClassNode, ClassExtensionNode, or NamespaceNode within this package
-        and uniquely identified by a fully-qualified 'fullname'.
         """
-        # Prefix the fullname with a Root.Smalltalk. if it isn't there already.
+        Return a fully-initialized ClassNode, ClassExtensionNode, or
+        NamespaceNode within this package and uniquely identified by
+        a fully-qualified 'fullname'.
+        """
+        
+        # Prefix the fullname with a Root.Smalltalk. if it isn't there
+        # already.
         if not fullname.startswith('Root.Smalltalk.'):
             fullname = 'Root.Smalltalk.' + fullname
-
         parts = fullname.split('.')
         environment, class_name = '.'.join(parts[:-1]), parts[-1]
 
-        # Collect any shared variables declared in this environment (class or namespace).
+        # Collect any shared variables declared in this environment (class or
+        # namespace).
         svars = []
         for row in self.repos.sql("""
-              SELECT name, blobdata FROM tw_dataandsourcesview
-              WHERE packageref = %i AND environmentstring = '%s'
-              """ % (self.id, fullname)):
+                SELECT name, blobdata FROM tw_dataandsourcesview
+                WHERE packageref = %i AND environmentstring = '%s'
+                """ % (self.id, fullname)):
             name, definition = row[0], _strac_decode(row[1])
             svar = SharedVariable(name)
             svar.set_definition(definition)
@@ -76,9 +100,9 @@ class PackageNode(StoreNode):
 
         # Look for a Namespace with this name first.
         for row in self.repos.sql("""
-              SELECT primarykey, commentid, blobdata FROM tw_pkgnamespacesandsourcesview
-              WHERE packageref = %i AND name = '%s' AND environmentstring = '%s'
-              """ % (self.id, class_name, environment)):
+                SELECT primarykey, commentid, blobdata FROM tw_pkgnamespacesandsourcesview
+                WHERE packageref = %i AND name = '%s' AND environmentstring = '%s'
+                """ % (self.id, class_name, environment)):
             namespace_id, comment_id, definition = row[0], row[1], _strac_decode(row[2])
             return NamespaceNode.fully_initialized(fullname, namespace_id, self,
                                                    definition, comment_id, svars)
@@ -88,29 +112,29 @@ class PackageNode(StoreNode):
         iprotocols = self._get_protocols_for(fullname)
         cprotocols = self._get_protocols_for(fullname + ' class')
         
-
         # Look for the class definition in tw_pkgclassesview.  If it's there, return the subnode
         # as a ClassNode.
         for row in self.repos.sql("""
-              SELECT primarykey, commentid, blobdata FROM tw_pkgclassesandsourcesview
-              WHERE packageref = %i AND name = '%s' AND environmentstring = '%s'
-              """ % (self.id, class_name, environment)):
+                SELECT primarykey, commentid, blobdata FROM tw_pkgclassesandsourcesview
+                WHERE packageref = %i AND name = '%s' AND environmentstring = '%s'
+                """ % (self.id, class_name, environment)):
             primarykey, comment_id, definition = row[0], row[1], _strac_decode(row[2])
             return ClassNode.fully_initialized(fullname, primarykey, self,
-                                               definition, comment_id,
-                                               iprotocols, cprotocols, svars)
+                definition, comment_id,
+                iprotocols, cprotocols, svars)
 
-        # If it isn't there, but we found some methods defined for this class,
-        # return a ClassExtensionNode.
-        if len(iprotocols) != 0 or len(cprotocols) != 0:
+        # If it isn't there, but we found some methods defined for this class
+        # or a shared variable, return a ClassExtensionNode.
+        if len(iprotocols) != 0 or len(cprotocols) != 0 or len(svars) != 0:
             return ClassExtensionNode.fully_initialized(fullname, self,
-                                                        iprotocols, cprotocols, svars)
+                iprotocols, cprotocols, svars)
 
         # No methods or definitions found: return None.
         return None
 
     def _get_protocols_for(self, class_name):
-        """Private method used by subnode_named() to fetch all methods defined within this
+        """
+        Private method used by subnode_named() to fetch all methods defined within this
         package for a class called class_name, organized in a structure of Protocols.
         """
 

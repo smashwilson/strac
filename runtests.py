@@ -8,7 +8,15 @@
 # This suite of unit tests depends on the presence of a certain configuration
 # of bundles and packages within the STORE repository.
 #
-# 
+# File-in the .st files found within the test/ directory and publish them
+# as follows:
+#
+#  TestBundle.1.0.st
+# Publish TestBundle as version 1.0, blessing level "Development", comment
+# "Comment for version 1.0".
+#  OtherBundle.1.0.st
+# Publish OtherBundle as version 1.0, blessing level "Development", no commit
+# comment.
 
 from trac.env import Environment
 

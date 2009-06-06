@@ -58,12 +58,12 @@ asStracObject
         self.assertNotEquals('', self.node.get_content().read(10))
 
     def test_shared_variable(self):
-        """Class extensions should know about shared variables they contain."""
-
-        package = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
-
-        print '\n'.join(x.name for x in package.get_entries())
+        """
+        Class extensions should know about shared variables they contain, even if
+        the shared variable is the only thing in that extension.
+        """
         
+        package = PackageNode.with_name(self.repos, 'TestPackage1', '1.0')
         node = package.subnode_named('Core.Point')
         self.assertEquals(
             ['ExtraVar'],
